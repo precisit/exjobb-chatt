@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/precisit/exjobb-chatt",
   "dependencies": {
+    "express": "^4.10.2",
     "ws": "^0.7.1"
   }
 }
