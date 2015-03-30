@@ -5,11 +5,7 @@ import json
 # One node for each user and one node for each topic and one node for each socket
 # Users are accessed by getting neighbors of the userRootNode
 # Topics are accessed by getting neighbors of the topicRootNode
-connect=nx.Graph()
-connect.add_node('userRootNode')
-connect.add_node('topicRootNode')
 
-<<<<<<< HEAD
 # g=nx.Graph()
 # g.add_node('userRootNode')
 # g.add_node('topicRootNode')
