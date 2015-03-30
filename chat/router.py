@@ -1,11 +1,15 @@
 import networkx as nx
 import json
 
-# The connection betweem the users and the topics are stored in g
+# The connection between the users and the topics are stored in connect
 # One node for each user and one node for each topic and one node for each socket
 # Users are accessed by getting neighbors of the userRootNode
 # Topics are accessed by getting neighbors of the topicRootNode
+connect=nx.Graph()
+connect.add_node('userRootNode')
+connect.add_node('topicRootNode')
 
+<<<<<<< HEAD
 # g=nx.Graph()
 # g.add_node('userRootNode')
 # g.add_node('topicRootNode')
@@ -36,3 +40,10 @@ clients = []
 # remove connection
 	def removeConnection(socket):
 		clients.remove(socket)
+=======
+	def addConnection(socket): 
+		connect.add_node(socket)
+		socket.routing_key=None
+
+	def removeconnection(socket): 
+>>>>>>> 6205ff505489a047151c3ceb0d60e268a72e4599
