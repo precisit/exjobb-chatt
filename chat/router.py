@@ -29,6 +29,7 @@ clients = []
 
 # handle message
 
+
 # add connection
 	def addConnection(socket):
 		clients.append(socket)

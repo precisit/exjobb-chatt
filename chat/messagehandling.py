@@ -2,13 +2,17 @@ import pika
 import sys
 import router
 
+from pika.adapters.tornado_connection import TornadoConnection
+
 # messagehandling via pika
 
-queue_servesmessages
-queue_clientmessages
+# queue_servermessages
+# queue_clientmessages
 
-class Consumer(object)
+class PikaClient(object)
 	def __init__(self,io_loop):
+		# giving unique queue for each consumer
+		# self.queue_name = "queue-%s" % (id(self),)
 		# create a new instance passing the io_loop used to connect to RabbitMQ
 		self.io_loop = io_loop
 
@@ -18,9 +22,6 @@ class Consumer(object)
         self.channel = None
  
         self.event_listeners = set([])
-
-	def connect(self):
-		# Connects to RabbitMQ, return the connection handle
 
     def connect(self):
         if self.connecting:
@@ -33,7 +34,7 @@ class Consumer(object)
         cred = pika.PlainCredentials('guest', 'guest')
         param = pika.ConnectionParameters(
             host='localhost',
-            port=3000,
+            port=5672,
             virtual_host='/',
             credentials=cred
         )
@@ -43,7 +44,7 @@ class Consumer(object)
         self.connection.add_on_close_callback(self.on_closed)
  
     def on_connected(self, connection):
-        pika.log.info('PikaClient: connected to RabbitMQ')
+        pika.log.info('PikaClient: connected to RabbitMQ on localhost: 5672')
         self.connected = True
         self.connection = connection
         self.connection.channel(self.on_channel_open)
@@ -51,13 +52,39 @@ class Consumer(object)
     def on_channel_open(self, channel):
         pika.log.info('PikaClient: Channel open, Declaring exchange')
         self.channel = channel
-        # declare exchanges, which in turn, declare
-        # queues, and bind exchange to queues
+
+        # declare exchanges
+        channel.exchange_declare(exchange = 'tornado-chat', 
+        						 type = 'direct'
+        						 )
+
+        # declare queues
+        # should be one for server queue and one for client queue
+        server = channels.queue_declare(exclusive = True)
+
+   # def on_exchange_declared(self,frame):
+   # 	print('PikaClient: Exchange Declared, Declaring Queue')
+   # 	self.channel.queue_declare(auto_delete = True,
+   # 							   queue = self.queue_name,
+   # 							   durable = False,
+   # 							   exclusive = True,
+   # 							   callback = self.on_queue_declared)
+
+    def on_queue_declared(self,frame):
+    	print('PikaClient: Queue Declared, Binding Queue')
+    	self.channel.queue_bind(exchange = 'tornado',
+    							queue = self.queue_name,
+    							routing_key = 'tornado.*',
+    							callback = self.on_queue_bound)
+
+    def on_queue_bound(self,frame):
+    	print('PikaClient: Message receive, delivery tag #%i' % method.delivery_tag)
  
     def on_closed(self, connection):
         pika.log.info('PikaClient: rabbit connection closed')
         self.io_loop.stop()
  
+ 	# on messages from server or client
     def on_message(self, channel, method, header, body):
         pika.log.info('PikaClient: message received: %s' % body)
         self.notify_listeners(event_factory(body))
