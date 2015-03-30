@@ -38,8 +38,6 @@ ws.onmessage = function (event) {
 
 
 
-
-
 // Send text to all users through the server
 function sendText() {
   // Construct a msg object containing the data the server needs to process the message from the chat client.
@@ -57,6 +55,10 @@ function sendText() {
 
 
 
+// A 'close' event handler for the client socket
+client.on('close', function() {
+    console.log('Connection closed');
+});
 
 
 
