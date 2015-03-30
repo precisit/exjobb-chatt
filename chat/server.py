@@ -4,20 +4,26 @@ import tornado.websocket
 import sys
 import tornado.log
 
+from tornado.options import define, options
+define("port", default=3000, help="run on the given port", type=int)
+define("debug", default=False, help="run in debug mode")
+
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 	 	self.write("message")
 
-
 class EchoWebSocket(websocket.WebSocketHandler):
 	def open(self):
+		router.addConnection(self)
 		self.write_message('Welcome to Siris and Kerstins chat')
 		print "Websocket opened."
 
 	def on_message(self,message):
+		for client in clients
 		self.write_message(u"You said: " + message)
 
 	def on_close(self):
+		clients.remove(self)
 		print "Websocket closed."
 
 	def check_origin(self,origin):
