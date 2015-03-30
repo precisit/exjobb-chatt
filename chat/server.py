@@ -33,7 +33,18 @@ application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/websocket", WebSocketHandler)
 ])
+def main():
+    pika.log.setup(color=True)
+ 
+    io_loop = tornado.ioloop.IOLoop.instance()
+ 
+    # PikaClient is our rabbitmq consumer
+    pc = client.PikaClient(io_loop)
+    application.pc = pc
+    application.pc.connect()
+ 
+    application.listen(3000)
+    io_loop.start()
 
 if __name__ == "__main__":
-    application.listen(3000)
-    tornado.ioloop.IOLoop.instance().start()
+    main()
