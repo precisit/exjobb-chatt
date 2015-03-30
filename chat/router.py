@@ -40,10 +40,4 @@ clients = []
 # remove connection
 	def removeConnection(socket):
 		clients.remove(socket)
-=======
-	def addConnection(socket): 
-		connect.add_node(socket)
-		socket.routing_key=None
 
-	def removeconnection(socket): 
->>>>>>> 6205ff505489a047151c3ceb0d60e268a72e4599
