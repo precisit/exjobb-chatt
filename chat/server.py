@@ -23,7 +23,7 @@ class EchoWebSocket(websocket.WebSocketHandler):
 		self.write_message(u"You said: " + message)
 
 	def on_close(self):
-		clients.remove(self)
+		router.removeConnection(self)
 		print "Websocket closed."
 
 	def check_origin(self,origin):

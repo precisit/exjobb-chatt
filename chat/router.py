@@ -10,11 +10,12 @@ import json
 # g.add_node('userRootNode')
 # g.add_node('topicRootNode')
 
+# store connections
 clients = []
 
-# store connections
-
-	def getUserName():
+# get user name
+	def getUserName(socket):
+		return clients.get(socket)
 
 # add user name
 	def setUserName(socket):
