@@ -1,6 +1,23 @@
 {
-	"name": "exjobb-chatt",
-	"version": "0.0.1",
-	"description": "Kerstin and Siris chat app",
-	"dependencies": {}
+  "name": "exjobb-chatt",
+  "version": "0.0.0",
+  "description": "A simple chat app",
+  "main": "client.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/precisit/exjobb-chatt.git"
+  },
+  "author": "Siri Persson, Kerstin Ersson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/precisit/exjobb-chatt/issues"
+  },
+  "homepage": "https://github.com/precisit/exjobb-chatt",
+  "dependencies": {
+    "express": "^4.10.2",
+    "ws": "^0.7.1"
+  }
 }
