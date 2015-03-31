@@ -17,15 +17,17 @@ clients = []
 	def getUserName(socket):
 		return clients.get(socket)
 
-# add user name
-	def setUserName(socket):
-		if userName == getUserName(socket) is not ''
-			newUserName = raw_input("Enter username: ")
-				if newUserName == ''
-					socket.write_message('You must choose a username.')
-				else
-					userName = newUserName
-					socket.write_message('Your username is: ' + userName)
+# set user name
+	def setUserName(socket, newUserName):
+		if newUserName == '':
+			userName = getUserName(socket)
+			if userName is None:
+				socket.write_message('You must choode a new username')
+			else:
+				socket.write_message('Your username is: ', userName)
+		else:
+			socket.write_message('Your username is: ', userName)
+			
 
 # handle message
 
