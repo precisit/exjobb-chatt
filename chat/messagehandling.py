@@ -6,9 +6,6 @@ from pika.adapters.tornado_connection import TornadoConnection
 
 # messagehandling via pika
 
-# queue_servermessages
-# queue_clientmessages
-
 class PikaClient(object)
 	def __init__(self,io_loop):
 		# giving unique queue for each consumer
@@ -54,28 +51,68 @@ class PikaClient(object)
         self.channel = channel
 
         # declare exchanges
-        channel.exchange_declare(exchange = 'tornado-chat', 
-        						 type = 'direct'
-        						 )
+        channel.exchange_declare(
+            exchange = 'tornado-chat', 
+        	type = 'direct'
+        )
 
         # declare queues
-        # should be one for server queue and one for client queue
-        server = channels.queue_declare(exclusive = True)
+        print('PikaClient: Exchange Declared, Declaring Queue')
 
-   # def on_exchange_declared(self,frame):
-   # 	print('PikaClient: Exchange Declared, Declaring Queue')
-   # 	self.channel.queue_declare(auto_delete = True,
-   # 							   queue = self.queue_name,
-   # 							   durable = False,
-   # 							   exclusive = True,
-   # 							   callback = self.on_queue_declared)
+        # client queue
+        channels.queue_declare(self.on_queue_declared_client, queue = clientQueue, exclusive = True, auto_delete = True)
 
-    def on_queue_declared(self,frame):
-    	print('PikaClient: Queue Declared, Binding Queue')
-    	self.channel.queue_bind(exchange = 'tornado',
-    							queue = self.queue_name,
-    							routing_key = 'tornado.*',
-    							callback = self.on_queue_bound)
+        # server queue
+        channels.queue_declare(self.on_queue_declared_server, queue = serverQueue, exclusive = True, auto_delete = True)
+
+    def on_queue_declared_client(self,queue):
+        self.clientQueue = result.method.queue
+        # binding queue
+        self.channel.queue_bind(
+            exchange = 'tornado-chat',
+            queue = self.clientQueue
+        )
+
+        # client queue should use callback, when receiving a message
+        self.channel.basic_consume(
+            self.on_message_client,
+            queue = self.clientQueue,
+            routing_key = client_routing_key
+        )
+
+    def on_queue_declared_server(self,queue):
+        self.serverQueue = result.method.queue
+        # binding queue
+        self.channel.queue_bind(
+            exchange = 'tornado-chat'
+            queue = self.serverQueue
+        )
+
+        # server queue should use callback, when receiving a message
+        self.channel.basic_consume(
+            self.on_message_server,
+            queue = self.serverQueue,
+            routing_key = server_routing_key
+        )
+
+    # def on_exchange_declared(self,frame):
+    # 	print('PikaClient: Exchange Declared, Declaring Queue')
+    # 	self.channel.queue_declare(
+    #        auto_delete = True,
+    # 		queue = self.queue_name,
+    # 		durable = False,
+    # 		exclusive = True,
+    # 		callback = self.on_queue_declared
+    #    )
+
+    # def on_queue_declared(self,frame):
+    # 	print('PikaClient: Queue Declared, Binding Queue')
+    # 	self.channel.queue_bind(
+    #         exchange = 'tornado',
+    # 		queue = self.queue_name,
+    # 		routing_key = 'tornado.*',
+    # 		callback = self.on_queue_bound
+    #     )
 
     def on_queue_bound(self,frame):
     	print('PikaClient: Message receive, delivery tag #%i' % method.delivery_tag)
