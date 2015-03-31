@@ -114,7 +114,7 @@ class PikaClient(object)
     # 		callback = self.on_queue_bound
     #     )
 
-    # Bind the queueto the specified exchange
+    # Bind the queueto the specified exchange 
     def on_queue_bound(self,frame):
     	print('PikaClient: Message receive, delivery tag #%i' % method.delivery_tag)
  
