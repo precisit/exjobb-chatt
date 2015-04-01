@@ -22,10 +22,10 @@ class PikaClient(object)
 
     def connect(self):
         if self.connecting:
-            pika.log.info('PikaClient: Already connecting to RabbitMQ')
+           print('PikaClient: Already connecting to RabbitMQ')
             return
  
-        pika.log.info('PikaClient: Connecting to RabbitMQ')
+        print('PikaClient: Connecting to RabbitMQ')
         self.connecting = True
  
         cred = pika.PlainCredentials('guest', 'guest')
@@ -36,18 +36,18 @@ class PikaClient(object)
             credentials=cred
         )
  
-        self.connection = TornadoConnection(param,
-            on_open_callback=self.on_connected)
-        self.connection.add_on_close_callback(self.on_closed)
+        self.connection = TornadoConnection(param, on_open_callback=self.on_connected)
+        # This will close the ioloop
+        # self.connection.add_on_close_callback(self.on_closed)
  
     def on_connected(self, connection):
-        pika.log.info('PikaClient: connected to RabbitMQ on localhost: 5672')
+        print('PikaClient: connected to RabbitMQ on localhost: 5672')
         self.connected = True
         self.connection = connection
         self.connection.channel(self.on_channel_open)
  
     def on_channel_open(self, channel):
-        pika.log.info('PikaClient: Channel open, Declaring exchange')
+        print('PikaClient: Channel open, Declaring exchange')
         self.channel = channel
 
         # declare exchanges
@@ -114,16 +114,17 @@ class PikaClient(object)
     # 		callback = self.on_queue_bound
     #     )
 
+    # Bind the queueto the specified exchange 
     def on_queue_bound(self,frame):
     	print('PikaClient: Message receive, delivery tag #%i' % method.delivery_tag)
  
     def on_closed(self, connection):
-        pika.log.info('PikaClient: rabbit connection closed')
+        print('PikaClient: rabbit connection closed')
         self.io_loop.stop()
  
  	# on messages from server or client
     def on_message(self, channel, method, header, body):
-        pika.log.info('PikaClient: message received: %s' % body)
+        print('PikaClient: message received: %s' % body)
         self.notify_listeners(event_factory(body))
 
         # should be different methods for server or client
@@ -135,15 +136,15 @@ class PikaClient(object)
  
         for listener in self.event_listeners:
             listener.write_message(event_json)
-            pika.log.info('PikaClient: notified %s' % repr(listener))
+            print('PikaClient: notified %s' % repr(listener))
  
     def add_event_listener(self, listener):
         self.event_listeners.add(listener)
-        pika.log.info('PikaClient: listener %s added' % repr(listener))
+        print('PikaClient: listener %s added' % repr(listener))
  
     def remove_event_listener(self, listener):
         try:
             self.event_listeners.remove(listener)
-            pika.log.info('PikaClient: listener %s removed' % repr(listener))
+            print('PikaClient: listener %s removed' % repr(listener))
         except KeyError:
             pass
