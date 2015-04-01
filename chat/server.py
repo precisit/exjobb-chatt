@@ -4,6 +4,9 @@ import tornado.websocket
 import sys
 import tornado.log
 
+import router
+from messagehandling import PikaClient
+
 from tornado.options import define, options
 define("port", default=3000, help="run on the given port", type=int)
 define("debug", default=False, help="run in debug mode")
@@ -20,7 +23,9 @@ class EchoWebSocket(websocket.WebSocketHandler):
 
 	def on_message(self,message):
 		for client in clients
-		self.write_message(u"You said: " + message)
+		# self.write_message(u"You said: " + message)
+		# här ska vi anropa den funktion i messagehandler som 
+		# hanterar meddelanden
 
 	def on_close(self):
 		router.removeConnection(self)

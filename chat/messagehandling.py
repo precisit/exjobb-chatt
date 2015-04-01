@@ -125,6 +125,8 @@ class PikaClient(object)
     def on_message(self, channel, method, header, body):
         pika.log.info('PikaClient: message received: %s' % body)
         self.notify_listeners(event_factory(body))
+
+        # should be different methods for server or client
  
     def notify_listeners(self, event_obj):
         # here we assume the message the sourcing app

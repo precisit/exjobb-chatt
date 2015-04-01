@@ -26,8 +26,7 @@ clients = []
 			else:
 				socket.write_message('Your username is: ', userName)
 		else:
-			socket.write_message('Your username is: ', userName)
-			
+			socket.write_message('Your username is: ', userName)	
 
 # handle message
 
