@@ -41,12 +41,16 @@ class PikaClient(object)
         # self.connection.add_on_close_callback(self.on_closed)
  
     def on_connected(self, connection):
+        # Called when we are fully connected to RabbitMQ
         print('PikaClient: connected to RabbitMQ on localhost: 5672')
         self.connected = True
         self.connection = connection
+
+        # Open a channel
         self.connection.channel(self.on_channel_open)
  
     def on_channel_open(self, channel):
+        # Called when our channel has opened
         print('PikaClient: Channel open, Declaring exchange')
         self.channel = channel
 
