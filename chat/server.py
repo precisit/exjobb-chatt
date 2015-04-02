@@ -25,6 +25,12 @@ class EchoWebSocket(tornado.websocket.WebSocketHandler):
 		self.write_message('New client connected')
 		print "You are connected."
 
+#class BaseHandler(tornado.web.RequestHandler):
+ #   def _handle_request_exception(self, e):
+  #      logging.error('error')
+
+
+
 	# def on_message(self,message):
 		# for client in clients
 		# self.write_message(u"You said: " + message)
@@ -44,6 +50,8 @@ application = tornado.web.Application([
     (r"/", MainHandler),
     (r"/websocket", EchoWebSocket)
 ])
+
+  
 def main():
     # pika.log.setup(color=True)
  
@@ -63,6 +71,8 @@ def main():
  
     application.listen(port) # listen to the port
     io_loop.start() # start the ioloop
+
+
 
 # By doing the main check, 
 # you can have that code only execute when you want to run the module as a program 

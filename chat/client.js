@@ -22,6 +22,8 @@ if (process.argv.length > 2) {
   port = process.argv[2];
 }
 
+
+
 // 2
 // Opens web socket and starts
 
@@ -32,6 +34,7 @@ ws.on('open', function open() {
 	// Sending message
 	// ws.send('Welcome to this excellent chat application!'); //Json representation skickas om object skall skickas
 });
+
 
 // ensures that interval timers arent still running after the
 // client has disconnected
@@ -45,17 +48,20 @@ ws.on('message', function message(data, flags) {
   // flags.binary will be set if binary data is received
   // flags.masked will be set if the data was masked
   console.log(data);
-});
-
+}); 
 
 
  // Handling error events 
 //it's usefull to handle request errors to avoid, for example, socket hang up errors on request timeouts 
-//ws.on('error', function(err){
-   // console.error('Something went wrong',err);
+//ws.on('error', function  _handle_request_exception(e) {
+   //console.error('Something went wrong',e);
+ //  console.log('Something went wrong', e);
 //});
  
 
+ //function _handle_request_exception(e){
+  //      logging.error('error')
+//}
 
  // ws.on('warning', function onErr(err){
     //   ws.emit('warning', err);
