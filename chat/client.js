@@ -23,17 +23,42 @@ if (process.argv.length > 2) {
 }
 
 
+var promptModule = require('cli-input');
+
+
+// Initialize prompt
+var prompt = promptModule({
+  input: process.stdin,
+  output: process.stderr,
+  infinite: true,
+  prompt: '',
+  name: ''
+});
+
+prompt.on('value', function(line) {
+  if (line[0] === '/quit') {
+    exit();
+  }
+  else {
+    var message = line.join(' ');
+    connection.send(message, {mask: true});
+  }
+});
+
 
 // 2
 // Opens web socket and starts
 
 // Opens the websocket
-ws.on('open', function open() {
-	console.log('Socket open!');
+ws.on = function open(){
   prompt.run()
+//ws.on('open', function open() {
+	//console.log('Socket open!');
+  //prompt.run()
 	// Sending message
 	// ws.send('Welcome to this excellent chat application!'); //Json representation skickas om object skall skickas
-});
+//});
+};
 
 
 // ensures that interval timers arent still running after the
@@ -48,7 +73,7 @@ ws.on('message', function message(data, flags) {
   // flags.binary will be set if binary data is received
   // flags.masked will be set if the data was masked
   console.log(data);
-}); 
+});
 
 
  // Handling error events 
@@ -101,26 +126,11 @@ ws.on('message', function message(data, flags) {
 });
 */
 
-var promptModule = require('cli-input');
-
-// Initialize prompt
-var prompt = promptModule({
-  input: process.stdin,
-  output: process.stderr,
-  infinite: true,
-  prompt: '',
-  name: ''
-});
-
-prompt.on('value', function(line) {
-  if (line[0] === '/quit') {
-    exit();
-  }
-  else {
-    var message = line.join(' ');
-    connection.send(message, {mask: true});
-  }
-});
+ // process.on('uncaughtException', function(err) {
+ //   console.log(err);
+ //   server.kill();
+  //  process.kill();
+  //});
 
 
 
