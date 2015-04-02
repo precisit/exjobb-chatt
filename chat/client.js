@@ -26,25 +26,46 @@ if (process.argv.length > 2) {
 // Opens web socket and starts
 
 // Opens the websocket
-ws.on('open', function() {
+ws.on('open', function open() {
 	console.log('Socket open!');
+  prompt.run()
 	// Sending message
 	// ws.send('Welcome to this excellent chat application!'); //Json representation skickas om object skall skickas
 });
 
 // ensures that interval timers arent still running after the
 // client has disconnected
-ws.on('close', function() {
+ws.on('close', function close() {
   console.log('Disconnected');
-  clearInterval(id);
+ // clearInterval(id);
   exit();
 });
 
-ws.on('message', function(data, flags) {
+ws.on('message', function message(data, flags) {
   // flags.binary will be set if binary data is received
   // flags.masked will be set if the data was masked
   console.log(data);
 });
+
+
+
+ // Handling error events 
+//it's usefull to handle request errors to avoid, for example, socket hang up errors on request timeouts 
+//ws.on('error', function(err){
+   // console.error('Something went wrong',err);
+//});
+ 
+
+
+ // ws.on('warning', function onErr(err){
+    //   ws.emit('warning', err);
+//   });
+
+ // function onErr(err) {
+//  console.log(err);
+// return 1;
+//}
+
 
 // 3
 // Client input 
@@ -97,29 +118,26 @@ prompt.on('value', function(line) {
 
 
 
-function onErr(err) {
-  console.log(err);
-  return 1;
-}
 
-process.on('uncaughtException', function (err) {
-    console.log(err);
-}); 
+//process.on('uncaughtException', function (err) {
+// console.log(err);
+//}); 
+
 
 // 4
 // Sending and receiving messages
 
 // By defining an onopen handler attempting to send data ONLY 
 // takes place once a connection is established 
-ws.onopen = function open() {
-  ws.send("Here's some text that the server is urgently awaiting!"); 
-  prompt.run()
-};
+//ws.onopen = function open() {
+ // ws.send("Here's some text that the server is urgently awaiting!"); 
+//  prompt.run()
+//};
 
 // Receiving messages from the server
-ws.onmessage = function (event) {
-  console.log(event.data);
-}
+//ws.onmessage = function (event) {
+ // console.log(event.data);
+//}
 
 // 5
 // Exiting and closing 
