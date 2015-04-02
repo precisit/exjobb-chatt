@@ -59,7 +59,7 @@ def main():
     if(len(sys.argv) > 1):
          port = int(sys.argv[1])
     else:
-         port = 3000
+         port = 8000
  
     application.listen(port) # listen to the port
     io_loop.start() # start the ioloop

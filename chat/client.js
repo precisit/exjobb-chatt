@@ -4,11 +4,14 @@
 
 // New variable which loads the module ws
 var WebSocket = require('ws');
+
 // Creates a port
-var port= 3000;
+var port= 8000;
 
 // Creates a websocket
-var ws = new WebSocket('ws://localhost:'+ port+'/echoSocket')
+var ws = new WebSocket('ws://0.0.0.0:'+ port+'/echoWebSocket')
+
+// localhost
 
 /* If the user has given another port the variable port is changed to the given number
 process.argv is an array which contains the command line argument. 
@@ -47,6 +50,7 @@ ws.on('message', function(data, flags) {
 // Client input 
 
 // To get input from the user the prompt module is used 
+/*
  var prompt = require('prompt');
 
   prompt.start();
@@ -68,20 +72,48 @@ ws.on('message', function(data, flags) {
     ws.send(message, {mask: true});
   }
 });
+*/
 
+var promptModule = require('cli-input');
 
-  function onErr(err) {
-    console.log(err);
-    return 1;
+// Initialize prompt
+var prompt = promptModule({
+  input: process.stdin,
+  output: process.stderr,
+  infinite: true,
+  prompt: '',
+  name: ''
+});
+
+prompt.on('value', function(line) {
+  if (line[0] === '/quit') {
+    exit();
   }
+  else {
+    var message = line.join(' ');
+    connection.send(message, {mask: true});
+  }
+});
+
+
+
+function onErr(err) {
+  console.log(err);
+  return 1;
+}
+
+process.on('uncaughtException', function (err) {
+    console.log(err);
+}); 
 
 // 4
 // Sending and receiving messages
 
 // By defining an onopen handler attempting to send data ONLY 
 // takes place once a connection is established 
-ws.onopen = function (event) {
+ws.onopen = function open() {
   ws.send("Here's some text that the server is urgently awaiting!"); 
+  prompt.run()
 };
 
 // Receiving messages from the server

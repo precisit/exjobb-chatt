@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/precisit/exjobb-chatt",
   "dependencies": {
+    "cli-input": "^0.1.8",
     "express": "^4.10.2",
+    "prompt": "^0.2.14",
     "ws": "^0.7.1"
   }
 }
