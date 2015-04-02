@@ -3,28 +3,32 @@ import tornado.web
 import tornado.websocket
 import sys
 import tornado.log
+# import logging
 
 import router
 from messagehandling import PikaClient
 
 from tornado.options import define, options
-define("port", default=3000, help="run on the given port", type=int)
-define("debug", default=False, help="run in debug mode")
+
+tornado.log.enable_pretty_logging()
+
+# define("port", default=3000, help="run on the given port", type=int)
+# define("debug", default=False, help="run in debug mode")
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 	 	self.write("Hello world")
 
-class EchoWebSocket(websocket.WebSocketHandler):
+class EchoWebSocket(tornado.websocket.WebSocketHandler):
 	def open(self):
 		router.addConnection(self) # Connect to router
 		self.write_message('New client connected')
 		print "You are connected."
 
-	def on_message(self,message):
-		for client in clients
+	# def on_message(self,message):
+		# for client in clients
 		# self.write_message(u"You said: " + message)
-		# här ska vi anropa den funktion i messagehandler som 
+		# anropa den funktion i messagehandler som 
 		# hanterar meddelanden
 
 	def on_close(self):
@@ -34,24 +38,30 @@ class EchoWebSocket(websocket.WebSocketHandler):
 	def check_origin(self,origin):
 		return True
 
-# r”” = regexp betyder att vi ska matcha
+# r regexp betyder att vi ska matcha
 # vilken klass ska hantera detta 
 application = tornado.web.Application([
     (r"/", MainHandler),
-    (r"/websocket", WebSocketHandler)
+    (r"/websocket", EchoWebSocket)
 ])
 def main():
-    pika.log.setup(color=True)
+    # pika.log.setup(color=True)
  
  	# Get a handle to the instance of ioloop
     io_loop = tornado.ioloop.IOLoop.instance()
  
     # PikaClient is our rabbitmq consumer
-    pc = client.PikaClient(io_loop)
-    application.pc = pc
-    application.pc.connect()
+    pc = PikaClient(io_loop)
+    pc.connect()
+
+    router.pc = pc
+
+    if(len(sys.argv) > 1):
+         port = int(sys.argv[1])
+    else:
+         port = 3000
  
-    application.listen(3000) # listen to the port
+    application.listen(port) # listen to the port
     io_loop.start() # start the ioloop
 
 # By doing the main check, 

@@ -14,29 +14,35 @@ import json
 clients = []
 
 # get user name
-	def getUserName(socket):
-		return clients.get(socket)
+def getUserName(socket):
+	return clients.get(socket)
 
 # set user name
-	def setUserName(socket, newUserName):
-		if newUserName == '':
-			userName = getUserName(socket)
-			if userName is None:
-				socket.write_message('You must choode a new username')
-			else:
-				socket.write_message('Your username is: ', userName)
+def setUserName(socket, newUserName):
+	if newUserName == '':
+		userName = getUserName(socket)
+		if userName is None:
+			socket.write_message('You must choode a new username')
 		else:
-			socket.write_message('Your username is: ', userName)	
+			socket.write_message('Your username is: ', userName)
+	else:
+		socket.write_message('Your username is: ', userName)	
 
 # handle message
+def handleMessage(socket,routing_key, message):
+	message = {
+	'user': userName,
+	'body': data
+	}
 
+	pc.send_user_message(routing_key, message)
 
 # add connection
-	def addConnection(socket):
-		clients.append(socket)
-		socket.routing_key = None
+def addConnection(socket):
+	clients.append(socket)
+	socket.routing_key = None
 
 # remove connection
-	def removeConnection(socket):
-		clients.remove(socket)
+def removeConnection(socket):
+	clients.remove(socket)
 
