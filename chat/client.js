@@ -18,8 +18,33 @@ if (process.argv.length > 2) {
   port = process.argv[2];
 }
 
+
 // Creates a websocket
 var ws = new WebSocket('ws://0.0.0.0:'+ port +'/websocket')
+
+
+var promptModule = require('cli-input');
+
+
+// Initialize prompt
+var prompt = promptModule({
+  input: process.stdin,
+  output: process.stderr,
+  infinite: true,
+  prompt: '',
+  name: ''
+});
+
+prompt.on('value', function(line) {
+  if (line[0] === '/quit') {
+    exit();
+  }
+  else {
+    var message = line.join(' ');
+    connection.send(message, {mask: true});
+  }
+});
+
 
 // 2
 // Opens web socket and starts
@@ -28,9 +53,17 @@ var ws = new WebSocket('ws://0.0.0.0:'+ port +'/websocket')
 ws.on('open', function open() {
 	console.log('Socket open!');
   ps.on();
+
+ws.on = function open(){
+  prompt.run()
+//ws.on('open', function open() {
+	//console.log('Socket open!');
+  //prompt.run()
+
 	// Sending message
 	// ws.send('Welcome to this excellent chat application!'); //Json representation skickas om object skall skickas
-});
+//});
+};
 
 ws.on('error', function(error) {
   console.log(error);
@@ -50,7 +83,7 @@ ws.on('message', function message(data, flags) {
   // flags.binary will be set if binary data is received
   // flags.masked will be set if the data was masked
   console.log(data);
-}); 
+});
 
 
  // Handling error events 
@@ -119,6 +152,13 @@ var ps = prompt({
   prompt: '',
   name: '',
 });
+
+ // process.on('uncaughtException', function(err) {
+ //   console.log(err);
+ //   server.kill();
+  //  process.kill();
+  //});
+
 
 ps.on('message', function(line) {
 //  if (line[0] === '/quit') {
