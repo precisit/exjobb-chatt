@@ -7,7 +7,7 @@ var WebSocket = require('ws');
 var prompt = require('cli-input');
 
 // Creates a port
-var port= 3000;
+var port = 3000;
 
 /* If the user has given another port the variable port is changed to the given number
 process.argv is an array which contains the command line argument. 
@@ -21,21 +21,26 @@ if (process.argv.length > 2) {
 
 // Creates a websocket
 var ws = new WebSocket('ws://0.0.0.0:'+ port +'/websocket')
+// Initializes prompt
+var prompt = require('cli-input');
 
-
-var promptModule = require('cli-input');
-
-
+var ps = prompt({
+  input: process.stdin,
+  output: process.stderr,
+  infinite: true,
+  prompt: '',
+  name: '',
+});
 // Initialize prompt
-var prompt = promptModule({
+/*var prompt = promptModule({
   input: process.stdin,
   output: process.stderr,
   infinite: true,
   prompt: '',
   name: ''
-});
+});*/
 
-prompt.on('value', function(line) {
+/*prompt.on('value', function(line) {
   if (line[0] === '/quit') {
     exit();
   }
@@ -43,7 +48,7 @@ prompt.on('value', function(line) {
     var message = line.join(' ');
     connection.send(message, {mask: true});
   }
-});
+});*/
 
 
 // 2
@@ -52,10 +57,12 @@ prompt.on('value', function(line) {
 // Opens the websocket
 ws.on('open', function open() {
 	console.log('Socket open!');
-  ps.on();
+  ps.run();
+});
 
-ws.on = function open(){
-  prompt.run()
+
+//ws.on = function open(){
+ // prompt.run()
 //ws.on('open', function open() {
 	//console.log('Socket open!');
   //prompt.run()
@@ -63,7 +70,7 @@ ws.on = function open(){
 	// Sending message
 	// ws.send('Welcome to this excellent chat application!'); //Json representation skickas om object skall skickas
 //});
-};
+
 
 ws.on('error', function(error) {
   console.log(error);
@@ -145,14 +152,6 @@ ws.on('message', function message(data, flags) {
   name: ''
 });*/
 
-var ps = prompt({
-  input: process.stdin,
-  output: process.stderr,
-  infinite: true,
-  prompt: '',
-  name: '',
-});
-
  // process.on('uncaughtException', function(err) {
  //   console.log(err);
  //   server.kill();
@@ -160,7 +159,7 @@ var ps = prompt({
   //});
 
 
-ps.on('message', function(line) {
+ps.on('value', function(line) {
 //  if (line[0] === '/quit') {
 //    exit();
 //  }
@@ -168,8 +167,7 @@ ps.on('message', function(line) {
   var message = line.join(' ');
   ws.send(message, {mask: true});
 //  }
-})
-ps.run();
+});
 
 //function clientError(exception, socket) {
 //  console.log('Something went wrong!');
