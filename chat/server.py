@@ -19,7 +19,7 @@ class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 	 	self.write("Hello world")
 
-class WebSocket(tornado.websocket.WebSocketHandler):
+class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		router.addConnection(self) # Connect to router
 		self.write_message('New client connected')
@@ -29,9 +29,8 @@ class WebSocket(tornado.websocket.WebSocketHandler):
  #   def _handle_request_exception(self, e):
   #      logging.error('error')
 
-
-
-	# def on_message(self,message):
+	def on_message(self,message):
+		router.handleMessage()
 		# for client in clients
 		# self.write_message(u"You said: " + message)
 		# anropa den funktion i messagehandler som 
@@ -44,14 +43,13 @@ class WebSocket(tornado.websocket.WebSocketHandler):
 	def check_origin(self,origin):
 		return True
 
-# r regexp betyder att vi ska matcha
-# vilken klass ska hantera detta 
+     # r regexp betyder att vi ska matcha
+	# vilken klass ska hantera detta 
 application = tornado.web.Application([
     (r"/", MainHandler),
-    (r"/websocket", WebSocket)
-])
+    (r"/websocket", WebSocketHandler),
+    ])
 
-  
 def main():
     # pika.log.setup(color=True)
  
@@ -67,7 +65,7 @@ def main():
     if(len(sys.argv) > 1):
          port = int(sys.argv[1])
     else:
-         port = 8000
+         port = 3000
  
     application.listen(port) # listen to the port
     io_loop.start() # start the ioloop

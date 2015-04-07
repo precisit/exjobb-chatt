@@ -7,7 +7,7 @@ var WebSocket = require('ws');
 var prompt = require('cli-input');
 
 // Creates a port
-var port= 8000;
+var port= 3000;
 
 /* If the user has given another port the variable port is changed to the given number
 process.argv is an array which contains the command line argument. 
@@ -19,7 +19,7 @@ if (process.argv.length > 2) {
 }
 
 // Creates a websocket
-var ws = new WebSocket('ws://0.0.0.0:'+ port +'/WebSocket')
+var ws = new WebSocket('ws://0.0.0.0:'+ port +'/websocket')
 
 // 2
 // Opens web socket and starts
@@ -30,9 +30,11 @@ ws.on('open', function open() {
   ps.on();
 	// Sending message
 	// ws.send('Welcome to this excellent chat application!'); //Json representation skickas om object skall skickas
-}).on('error', function() {
-  console.log(arguments);
-  throw 'defect!';
+});
+
+ws.on('error', function(error) {
+  console.log(error);
+  // throw 'defect!';
 });
 
 
@@ -59,8 +61,8 @@ ws.on('message', function message(data, flags) {
 //});
  
 
- //function _handle_request_exception(e){
-  //      logging.error('error')
+//function _handle_request_exception(e){
+//        logging.error('error')
 //}
 
  // ws.on('warning', function onErr(err){
@@ -118,20 +120,20 @@ var ps = prompt({
   name: '',
 });
 
-ps.on('value', function(line) {
+ps.on('message', function(line) {
 //  if (line[0] === '/quit') {
 //    exit();
 //  }
 //  else {
   var message = line.join(' ');
-  connection.send(message, {mask: true});
+  ws.send(message, {mask: true});
 //  }
 })
 ps.run();
 
-function clientError(exception, socket) {
-  console.log('Something went wrong!');
-};
+//function clientError(exception, socket) {
+//  console.log('Something went wrong!');
+//};
 
 
 
@@ -159,6 +161,7 @@ function clientError(exception, socket) {
 // Exiting and closing 
 function exit() {
 //ws.close(); // Close the websocket connection 
+  ws.close();
   console.log('Socket closed!');
   console.log('Goodbye!');
   process.exit(); // Exit

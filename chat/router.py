@@ -1,4 +1,4 @@
-import networkx as nx
+#import networkx as nx
 import json
 
 # The connection between the users and the topics are stored in connect
@@ -29,7 +29,7 @@ def setUserName(socket, newUserName):
 		socket.write_message('Your username is: ', userName)	
 
 # handle message
-def handleMessage(socket,routing_key, message):
+def handleMessage(socket, routing_key, message):
 	message = {
 	'user': userName,
 	'body': data
