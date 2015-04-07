@@ -19,7 +19,7 @@ class MainHandler(tornado.web.RequestHandler):
 	def get(self):
 	 	self.write("Hello world")
 
-class EchoWebSocket(tornado.websocket.WebSocketHandler):
+class WebSocket(tornado.websocket.WebSocketHandler):
 	def open(self):
 		router.addConnection(self) # Connect to router
 		self.write_message('New client connected')
@@ -48,7 +48,7 @@ class EchoWebSocket(tornado.websocket.WebSocketHandler):
 # vilken klass ska hantera detta 
 application = tornado.web.Application([
     (r"/", MainHandler),
-    (r"/websocket", EchoWebSocket)
+    (r"/websocket", WebSocket)
 ])
 
   

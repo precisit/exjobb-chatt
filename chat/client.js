@@ -1,17 +1,13 @@
-
 // 1 
 //Creating port and websocket
 
 // New variable which loads the module ws
 var WebSocket = require('ws');
+// module used for the prompt
+var prompt = require('cli-input');
 
 // Creates a port
 var port= 8000;
-
-// Creates a websocket
-var ws = new WebSocket('ws://0.0.0.0:'+ port+'/echoWebSocket')
-
-// localhost
 
 /* If the user has given another port the variable port is changed to the given number
 process.argv is an array which contains the command line argument. 
@@ -22,7 +18,8 @@ if (process.argv.length > 2) {
   port = process.argv[2];
 }
 
-
+// Creates a websocket
+var ws = new WebSocket('ws://0.0.0.0:'+ port +'/WebSocket')
 
 // 2
 // Opens web socket and starts
@@ -30,9 +27,12 @@ if (process.argv.length > 2) {
 // Opens the websocket
 ws.on('open', function open() {
 	console.log('Socket open!');
-  prompt.run()
+  ps.on();
 	// Sending message
 	// ws.send('Welcome to this excellent chat application!'); //Json representation skickas om object skall skickas
+}).on('error', function() {
+  console.log(arguments);
+  throw 'defect!';
 });
 
 
@@ -101,27 +101,37 @@ ws.on('message', function message(data, flags) {
 });
 */
 
-var promptModule = require('cli-input');
-
 // Initialize prompt
-var prompt = promptModule({
+/*var prompt = promptModule({
   input: process.stdin,
   output: process.stderr,
   infinite: true,
   prompt: '',
   name: ''
+});*/
+
+var ps = prompt({
+  input: process.stdin,
+  output: process.stderr,
+  infinite: true,
+  prompt: '',
+  name: '',
 });
 
-prompt.on('value', function(line) {
-  if (line[0] === '/quit') {
-    exit();
-  }
-  else {
-    var message = line.join(' ');
-    connection.send(message, {mask: true});
-  }
-});
+ps.on('value', function(line) {
+//  if (line[0] === '/quit') {
+//    exit();
+//  }
+//  else {
+  var message = line.join(' ');
+  connection.send(message, {mask: true});
+//  }
+})
+ps.run();
 
+function clientError(exception, socket) {
+  console.log('Something went wrong!');
+};
 
 
 
@@ -148,10 +158,10 @@ prompt.on('value', function(line) {
 // 5
 // Exiting and closing 
 function exit() {
-ws.close(); // Close the websocket connection 
-console.log('Socket closed!');
-console.log('Goodbye!');
-process.exit(); // Exit
+//ws.close(); // Close the websocket connection 
+  console.log('Socket closed!');
+  console.log('Goodbye!');
+  process.exit(); // Exit
 }
 
 
