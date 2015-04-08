@@ -30,7 +30,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
   #      logging.error('error')
 
 	def on_message(self,message):
-		router.handleMessage()
+		router.handleMessage(self, message)
 		# for client in clients
 		# self.write_message(u"You said: " + message)
 		# anropa den funktion i messagehandler som 
@@ -41,6 +41,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 		print "Websocket closed."
 
 	def check_origin(self,origin):
+		print "Origin: " + origin
 		return True
 
      # r regexp betyder att vi ska matcha
@@ -69,8 +70,6 @@ def main():
  
     application.listen(port) # listen to the port
     io_loop.start() # start the ioloop
-
-
 
 # By doing the main check, 
 # you can have that code only execute when you want to run the module as a program 
