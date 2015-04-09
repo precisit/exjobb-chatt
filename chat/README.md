@@ -4,4 +4,4 @@ For learning Node and Tornado a simple chatt app was created.
 
 ## Installation instructions
 
-To be written
+Install dependencies and then follow these instructions
