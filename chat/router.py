@@ -81,8 +81,10 @@ def processMessage(routing_key, message):
 		if socket.routing_key == routing_key:
 			ind.append(clients.index(socket))
 
-	for i in range(1,len(ind)):
-		s = clients[ind] 
+	print ind
+
+	for i in range(0,len(ind)):
+		s = clients[ind[i]] 
 		data = dict(json.loads(message))
 
 		s.write_message("%s says %s" % (data['user'], data['body']))
