@@ -47,7 +47,6 @@ def handleMessage(socket, message):
 			return
 
 		userName = getUserName(socket)
-		print userName
 		if userName is None:
 			socket.write_message("Set a username first!")
 			return
@@ -69,8 +68,6 @@ def processMessage(routing_key, message):
 	for socket in clients:
 		if socket.routing_key == routing_key:
 			ind.append(clients.index(socket))
-
-	print ind
 
 	for i in range(0,len(ind)):
 		s = clients[ind[i]] 
