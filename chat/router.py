@@ -56,7 +56,7 @@ def handleMessage(socket, message):
 		if (len(users) == 0):
 			socket.write_message("Set a username first!")
 			return
-			
+
 		userName = getUserName(socket)
 		print userName
 		if userName is None:
@@ -76,14 +76,16 @@ def handleMessage(socket, message):
 		pc.send_message(routing_key, sendMessage)
 
 def processMessage(routing_key, message):
+	ind=[]
 	for socket in clients:
 		if socket.routing_key == routing_key:
-			ind = clients.index(socket)
+			ind.append(clients.index(socket))
 
-	s = clients[ind] 
-	data = dict(json.loads(message))
+	for i in range(1,len(ind)):
+		s = clients[ind] 
+		data = dict(json.loads(message))
 
-	s.write_message("%s says %s" % (data['user'], data['body']))
+		s.write_message("%s says %s" % (data['user'], data['body']))
 
 # add connection
 def addConnection(socket):
