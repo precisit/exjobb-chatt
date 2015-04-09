@@ -1,6 +1,6 @@
 #import networkx as nx
 import json
-import customserializer
+#import customserializer
 
 # The connection between the users and the topics are stored in connect
 # One node for each user and one node for each topic and one node for each socket
@@ -13,43 +13,67 @@ import customserializer
 
 # store connections
 clients = []
+# store usernames
+users = []
 
 # get user name
 def getUserName(socket):
 	i = clients.index(socket)
 
-	return clients[i]
+	return users[i]
 
 # set user name
 def setUserName(socket, newUserName):
-	if newUserName == '':
-		userName = getUserName(socket)
-		if userName is None:
-			socket.write_message('You must choode a new username')
-		else:
-			socket.write_message('Your username is: ', userName)
-	else:
-		socket.write_message('Your username is: ', userName)	
+	newUserName = str(newUserName)
+	userName = newUserName
+
+#	if userName == '':
+#		userName = getUserName(socket)
+#		if userName is None:
+#			socket.write_message('You must choose a new username')
+#		else:
+#			socket.write_message('Your username is: ', userName)
+#	else:
+#		socket.write_message('Your username is: ', userName)
+
+	i = clients.index(socket)
+	users.append(userName)
+	socket.write_message("Your username is " + userName)
 
 # handle message
 def handleMessage(socket, message):
-	print "Message: %s" % message
-	userName = getUserName(socket)
-	if userName is None:
-		socket.write_message("Set a username first!")
-		return
+	#print "Message: %s" % message
+	usrandmessage = message.partition(" ")
 
-	message = {
-	#	'user': userName,
-		'body': message
-	}
+	if (usrandmessage[0] == "usr"):
+		usr = usrandmessage[2]
+		setUserName(socket, usr)
 
-	print "Send message"
-	routing_key = socket.routing_key
-	sendMessage = json.dumps(message)
+	#elif (usrandmessage[0] == "exit"):
+	#	removeConnection(socket)
 
-	#print sendMessage
-	pc.send_message(routing_key, sendMessage)
+	else:
+		if (len(users) == 0):
+			socket.write_message("Set a username first!")
+			return
+			
+		userName = getUserName(socket)
+		print userName
+		if userName is None:
+			socket.write_message("Set a username first!")
+			return
+
+		message = {
+			'user': userName,
+			'body': message
+		}
+
+		print "Send message"
+		routing_key = socket.routing_key
+		sendMessage = json.dumps(message)
+
+		#print sendMessage
+		pc.send_message(routing_key, sendMessage)
 
 def processMessage(routing_key, message):
 	for socket in clients:
@@ -59,7 +83,7 @@ def processMessage(routing_key, message):
 	s = clients[ind] 
 	data = dict(json.loads(message))
 
-	s.write_message(data['body'])
+	s.write_message("%s says %s" % (data['user'], data['body']))
 
 # add connection
 def addConnection(socket):
@@ -68,5 +92,7 @@ def addConnection(socket):
 
 # remove connection
 def removeConnection(socket):
+	i = clients.index(socket)
 	clients.remove(socket)
 
+	#del clients[i]

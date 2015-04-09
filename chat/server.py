@@ -23,6 +23,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 	def open(self):
 		router.addConnection(self) # Connect to router
 		self.write_message('New client connected')
+		self.write_message('Submit a username. Write: usr username')
+		#self.write_message('Set your username')
+		#username = raw_input("What is your name? ")
+		#router.setUserName(self,username) # set username
 		print "You are connected."
 
 #class BaseHandler(tornado.web.RequestHandler):

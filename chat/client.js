@@ -5,6 +5,7 @@
 var WebSocket = require('ws');
 // module used for the prompt
 var prompt = require('cli-input');
+var p = require('prompt');
 
 // Creates a port
 var port = 3000;
@@ -18,11 +19,8 @@ if (process.argv.length > 2) {
   port = process.argv[2];
 }
 
-
 // Creates a websocket
 var ws = new WebSocket('ws://127.0.0.1:'+ port +'/websocket')
-// Initializes prompt
-var prompt = require('cli-input');
 
 var ps = prompt({
   input: process.stdin,
@@ -35,14 +33,20 @@ var ps = prompt({
 // Opens the websocket
 ws.on('open', function open() {
 	console.log('Socket open!');
+  userName = ''; // username
   ps.run();
+//  p.start();
 });
+
+/*p.get(['username'], function(err,result) {
+  user = result.username;
+  console.log('Your username is: ' + user);
+  json.dumps(user);
+});*/
 
 ws.on('error', function(error) {
   console.log(error);
-  // throw 'defect!';
 });
-
 
 // ensures that interval timers arent still running after the
 // client has disconnected
@@ -58,12 +62,10 @@ ws.on('message', function message(data, flags) {
   console.log(data);
 });
 
-
 ps.on('value', function(line) {
-  var message = line.join(' ');
-  ws.send(message, {mask: true});
-  console.log("Message sent")
-//  }
+    var message = line.join(' ');
+    ws.send(message, {mask: true});
+    console.log("Message sent");
 });
 
 // 5
