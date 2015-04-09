@@ -1,15 +1,4 @@
-#import networkx as nx
 import json
-#import customserializer
-
-# The connection between the users and the topics are stored in connect
-# One node for each user and one node for each topic and one node for each socket
-# Users are accessed by getting neighbors of the userRootNode
-# Topics are accessed by getting neighbors of the topicRootNode
-
-# g=nx.Graph()
-# g.add_node('userRootNode')
-# g.add_node('topicRootNode')
 
 # store connections
 clients = []
@@ -92,6 +81,7 @@ def processMessage(routing_key, message):
 # add connection
 def addConnection(socket):
 	clients.append(socket)
+	print clients
 	socket.routing_key = 'routing_key'
 
 # remove connection

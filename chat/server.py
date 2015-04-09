@@ -3,7 +3,6 @@ import tornado.web
 import tornado.websocket
 import sys
 import tornado.log
-# import logging
 
 import router
 from messagehandling import PikaClient
@@ -11,9 +10,6 @@ from messagehandling import PikaClient
 from tornado.options import define, options
 
 tornado.log.enable_pretty_logging()
-
-# define("port", default=3000, help="run on the given port", type=int)
-# define("debug", default=False, help="run in debug mode")
 
 class MainHandler(tornado.web.RequestHandler):
 	def get(self):
@@ -29,16 +25,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 		#router.setUserName(self,username) # set username
 		print "You are connected."
 
-#class BaseHandler(tornado.web.RequestHandler):
- #   def _handle_request_exception(self, e):
-  #      logging.error('error')
-
 	def on_message(self,message):
 		router.handleMessage(self, message)
-		# for client in clients
-		# self.write_message(u"You said: " + message)
-		# anropa den funktion i messagehandler som 
-		# hanterar meddelanden
 
 	def on_close(self):
 		router.removeConnection(self)
@@ -48,7 +36,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 		print "Origin: " + origin
 		return True
 
-     # r regexp betyder att vi ska matcha
+    # r regexp betyder att vi ska matcha
 	# vilken klass ska hantera detta 
 application = tornado.web.Application([
     (r"/", MainHandler),
@@ -56,9 +44,7 @@ application = tornado.web.Application([
     ])
 
 def main():
-    # pika.log.setup(color=True)
- 
- 	# Get a handle to the instance of ioloop
+	# Get a handle to the instance of ioloop
     io_loop = tornado.ioloop.IOLoop.instance()
  
     # PikaClient is our rabbitmq consumer

@@ -1,11 +1,9 @@
-// 1 
 //Creating port and websocket
 
 // New variable which loads the module ws
 var WebSocket = require('ws');
 // module used for the prompt
 var prompt = require('cli-input');
-//var p = require('prompt');
 
 // Creates a port
 var port = 3000;
@@ -33,16 +31,8 @@ var ps = prompt({
 // Opens the websocket
 ws.on('open', function open() {
 	console.log('Socket open!');
-  userName = ''; // username
   ps.run();
-//  p.start();
 });
-
-/*p.get(['username'], function(err,result) {
-  user = result.username;
-  console.log('Your username is: ' + user);
-  json.dumps(user);
-});*/
 
 ws.on('error', function(error) {
   console.log(error);
@@ -52,7 +42,6 @@ ws.on('error', function(error) {
 // client has disconnected
 ws.on('close', function close() {
   console.log('Disconnected');
- // clearInterval(id);
   exit();
 });
 
@@ -68,10 +57,8 @@ ps.on('value', function(line) {
     console.log("Message sent");
 });
 
-// 5
 // Exiting and closing 
 function exit() {
-//ws.close(); // Close the websocket connection 
   ws.close();
   console.log('Socket closed!');
   console.log('Goodbye!');
