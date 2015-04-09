@@ -5,7 +5,7 @@
 var WebSocket = require('ws');
 // module used for the prompt
 var prompt = require('cli-input');
-var p = require('prompt');
+//var p = require('prompt');
 
 // Creates a port
 var port = 3000;
