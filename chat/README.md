@@ -1,8 +1,8 @@
 # Siri och Kerstins Exjobb-chatt
 
-For learning Node and Tornado a simple chatt app was created. 
+To learn Node and Tornado a simple chatt application was created. 
 
-## Installation instructions
+## Installation instruction
 
 Install dependencies and then follow these instructions
 
