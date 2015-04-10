@@ -6,11 +6,10 @@ For learning Node and Tornado a simple chatt app was created.
 
 Install dependencies and then follow these instructions
 
+	pip install tornado.
+	python server.py.
 
-<pip install tornado>
-<python server.py>
+Run client by command
 
-### Run client by command
-
-<npm install>
-<node client.js>
+	npm install.
+	node client.js.
