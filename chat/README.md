@@ -7,6 +7,7 @@ To learn Node and Tornado a simple chatt application was created.
 Install dependencies and then follow these instructions
 
 	pip install tornado.
+	pip install networkx.
 	python server.py.
 
 Run client by command
