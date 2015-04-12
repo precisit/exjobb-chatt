@@ -126,30 +126,6 @@ def handleMessage(socket, message):
 		#print sendMessage
 		#pc.send_client_message(message.routing_key, jsonMessage)
 
-def processClientMessage(routing_key, message):
-	#ind=[]
-	#for socket in clients:
-	#	if socket.routing_key == routing_key:
-	#		ind.append(clients.index(socket))
-
-	print message
-
-	try: 
-		iterator = g.neighbors_iter(routing_key)
-	except nx.NetworkXError:
-		print 'Invalid routing key'
-		return
-
-	data = dict(json.loads(message))
-
-	for x in iterator:
-		if x is not userNode:
-			s.write_message("%s says %s" % (data['user'], data['body']))
-
-def processServerMessage(routing_key, message):
-	data = dict(json.loads(message))
-	print "Server message"
-
 # add connection
 def addConnection(socket):
 

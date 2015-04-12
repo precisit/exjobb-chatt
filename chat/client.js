@@ -49,6 +49,8 @@ ws.on('message', function message(data, flags) {
   // flags.binary will be set if binary data is received
   // flags.masked will be set if the data was masked
   console.log(data);
+
+  //TODO Change so it shows who sent and what it was e.g. "siri: hej!" or "error: set username first!"
 });
 
 ps.on('value', function(line) {
