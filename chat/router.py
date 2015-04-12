@@ -1,56 +1,99 @@
 import json
-import networkx as nx
+
+from collections import defaultdict
+
 import pika
 from pika import adapters
+import uuid
 
 userNode='userNode'
+
 #topicNode='topicNode'
 
 # Create an empty graph with no nodes and no edges 
-g = nx.Graph()
+#g = nx.Graph()
 # Add the nodes 
-g.add_node(userNode)
+#g.add_node(userNode)
 #g.add_node(topicNode)
 
-# Old code
-
-# store connections
-#clients = []
 # store usernames
-#users = []
+users = dict()
+# store subscriptions
+socketsInRoomName = defaultdict(list)
 
-# get user name
-def getUserName(socket):
-	#i = clients.index(socket)
-	#return users[i]
+class PikaConsumer(object):
 
-	try:
-		return list(nx.common_neighbors(g, socket, userNode))[0]
-	except (nx.NetworkXError, IndexError):
-		return None
+	# Set up PikaClient
+	cred = pika.PlainCredentials('guest', 'guest')
+	param = pika.ConnectionParameters(
+		host='localhost',
+		virtual_host='/',
+		connection_attempts=10,
+		credentials=cred
+	)
+
+	QUEUE = str(uuid.uuid4())
+	EXCHANGE = 'siriokerstin'
+
+	roomNameSubscriptions = dict()
+
+	def open(self): 
+		self.connection = adapters.TornadoConnection(self.param, self.on_connection_open)
+
+	def on_connection_open(self, connection_unused): 
+		print 'Connection opened'
+		self.connection.channel(on_open_callback=self.on_channel_open)
+
+	def on_channel_open(self, channel):
+		print 'Channel opened'
+		self.channel = channel
+		self.channel.exchange_declare(self.on_exchange_declareok, self.EXCHANGE, 'topic')
+
+	def on_exchange_declareok(self, frame_unused):
+		print 'Exchange declared ok'
+		print 'Will declare queue', self.QUEUE
+		self.channel.queue_declare(self.on_queue_declareok, self.QUEUE)
+
+	def on_queue_declareok(self, method_frame):
+		print 'Queue declared ok'
+		print 'Will bind to routing keys as users subscribe to channels'
+
+	def on_bindok(self, frame_unused):
+		print 'Bind OK for routing key'
+		self.channel.basic_consume(self.on_message, self.QUEUE)
+
+	def on_message(self, channel_unused, basic_deliver, properties, body):
+		roomName = basic_deliver.routing_key.split('.')[1]
+		print 'Message received FROM RabbitMQ on room', roomName
+
+		for socket in socketsInRoomName[roomName]:
+			socket.write_message(body)
+
+		self.channel.basic_ack(basic_deliver.delivery_tag)
+
+	def join_talkRoom(self, roomName):
+		print 'Will join talkRoom', roomName
+		if roomName not in self.roomNameSubscriptions:
+			print '  - Doing new Subscribe (first)'
+			self.roomNameSubscriptions[roomName] = self.channel.queue_bind(self.on_bindok, self.QUEUE, self.EXCHANGE, 'channel.' + roomName)
+		else: 
+			print '  - Already subscribed'
+
+	def send_message(self, roomName, message):
+		print 'Will send message to room', roomName
+		self.channel.basic_publish(self.EXCHANGE, 'channel.'+roomName, message, properties=None, mandatory=False, immediate=False)
+
+pikaConsumer = PikaConsumer()
+pikaConsumer.open()
+
 
 # set user name
 def setUserName(socket, newUserName):
-	newUserName = str(newUserName)
-	userName = newUserName
+	print 'Username was set', newUserName
+	socket.username = newUserName
+	users[newUserName] = socket
 
-#	if userName == '':
-#		userName = getUserName(socket)
-#		if userName is None:
-#			socket.write_message('You must choose a new username')
-#		else:
-#			socket.write_message('Your username is: ', userName)
-#	else:
-#		socket.write_message('Your username is: ', userName)
-
-	g.add_edge(newUserName, socket)
-	g.add_edge(newUserName, userNode)
-
-	pc.bind_client_queue(newUserName)
-
-	#i = clients.index(socket)
-	#users.append(userName)
-	socket.write_message("Your username is " + userName)
+	#users['siri'].write_message('hej')
 
 # handle message
 def handleMessage(socket, message):
@@ -65,7 +108,7 @@ def handleMessage(socket, message):
 	#	removeConnection(socket)
 
 	else:
-		userName = getUserName(socket)
+		userName = socket.username
 		if userName is None:
 			socket.write_message("Set a username first!")
 			return
@@ -76,11 +119,12 @@ def handleMessage(socket, message):
 		}
 
 		print "Send message"
-		routing_key = socket.routing_key
-		sendMessage = json.dumps(message)
+		jsonMessage = json.dumps(message)
+
+		pikaConsumer.send_message('the_only_room', jsonMessage)
 
 		#print sendMessage
-		pc.send_client_message(routing_key, sendMessage)
+		#pc.send_client_message(message.routing_key, jsonMessage)
 
 def processClientMessage(routing_key, message):
 	#ind=[]
@@ -108,24 +152,28 @@ def processServerMessage(routing_key, message):
 
 # add connection
 def addConnection(socket):
-	#clients.append(socket)
+
+	# Temporary when we have only one room, later should be set in a join chatroom method
+	pikaConsumer.join_talkRoom('the_only_room')
+	socketsInRoomName['the_only_room'].append(socket)
+
+
 	#print clients
-	socket.routing_key = 'routing_key'
-	g.add_node(socket)
+	#socket.routing_key = 'routing_key'
+	#g.add_node(socket)
 
 
 # remove connection
 def removeConnection(socket):
-	#i = clients.index(socket)
-	#clients.remove(socket)
-	userName = getUserName(socket)
-	if userName is not None:
-		g.remove_node(userName)
+	# Remove user from dictionaries
+	del users[socket.username]
 
-		pc.unbind_queue(userName)
-
-	# Remove socket node
-	g.remove_node(socket)
+	for roomName in socketsInRoomName: 
+		room = socketsInRoomName[roomName]
+		del room[room.index(socket)]
 
 
-	#del clients[i]
+
+
+
+
