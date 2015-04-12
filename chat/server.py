@@ -5,7 +5,6 @@ import sys
 import tornado.log
 
 import router
-from messagehandling import PikaClient
 
 from tornado.options import define, options
 
@@ -46,12 +45,6 @@ application = tornado.web.Application([
 def main():
 	# Get a handle to the instance of ioloop
     io_loop = tornado.ioloop.IOLoop.instance()
- 
-    # PikaClient is our rabbitmq consumer
-    pc = PikaClient(io_loop)
-    pc.connect()
-
-    router.pc = pc
 
     if(len(sys.argv) > 1):
          port = int(sys.argv[1])

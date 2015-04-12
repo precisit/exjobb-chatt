@@ -1,5 +1,7 @@
 import json
 import networkx as nx
+import pika
+from pika import adapters
 
 userNode='userNode'
 #topicNode='topicNode'
