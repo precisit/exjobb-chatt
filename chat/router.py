@@ -2,27 +2,16 @@ import json
 
 from collections import defaultdict
 
-import pika
-from pika import adapters
-import uuid
-
-userNode='userNode'
-
-#topicNode='topicNode'
-
-# Create an empty graph with no nodes and no edges 
-#g = nx.Graph()
-# Add the nodes 
-#g.add_node(userNode)
-#g.add_node(topicNode)
+import pikaConsumer
+from pikaConsumer import PikaConsumer
 
 # store usernames
 users = dict()
 # store subscriptions
 socketsInRoomName = defaultdict(list)
 
-pikaConsumer = PikaConsumer()
-pikaConsumer.open()
+pC = PikaConsumer()
+pC.open()
 
 # set user name
 def setUserName(socket, newUserName):
@@ -30,7 +19,16 @@ def setUserName(socket, newUserName):
 	socket.username = newUserName
 	users[newUserName] = socket
 
-	#users['siri'].write_message('hej')
+	welcomeMessage = newUserName + " joined the chat. Welcome " + newUserName + "!"
+
+	message = {
+		'user': 'Chat',
+		'body': welcomeMessage
+	}
+
+	jsonM = json.dumps(message)
+
+	pC.send_message('the_first_room', jsonM)
 
 # handle message
 def handleMessage(socket, message):
@@ -38,41 +36,68 @@ def handleMessage(socket, message):
 	# TODO: Client always send JSON as well, e.g. {command: 'setUsername', username: xxxx} OR {'command': 'sendMessage', roomName: 'the_only_room', message: 'Hello World!'}
 	# TODO2: Add command "joinChannel"
 	# TODO3: Add command "leaveChannel"
-	usrandmessage = message.partition(" ")
+	message = json.loads(message)
+	command = message['command']
 
-	if (usrandmessage[0] == "usr"):
-		usr = usrandmessage[2]
+	if (command == 'setUsername'):
+		usr = message['body']
+		print "setting username"
 		setUserName(socket, usr)
 
-	#elif (usrandmessage[0] == "exit"):
-	#	removeConnection(socket)
-
-	else:
+	elif (command == 'sendMessage'):
 		userName = socket.username
 		if userName is None:
-			socket.write_message("Set a username first!")
+			socket.write_message('Error: Set a username first!')
 			return
+
+		body = message['body']
+		roomName = message['room']
+
+		if (roomName == 'default'):
+			roomName = 'the_first_room' # default
 
 		message = {
 			'user': userName,
-			'body': message
+			'room name': roomName,
+			'body': body
 		}
 
 		print "Send message"
 		jsonMessage = json.dumps(message)
 
-		pikaConsumer.send_message('the_only_room', jsonMessage)
+		pC.send_message(roomName, jsonMessage)
 
-		#print sendMessage
-		#pc.send_client_message(message.routing_key, jsonMessage)
+	elif (command == 'join'):
+		userName = socket.username
+		if userName is None:
+			socket.write_message('Error: Set a username first!')
+			return
+
+		roomName = message['body']
+		pC.join_talkRoom(roomName)
+		socketsInRoomName[roomName].append(socket)
+		socket.write_message('You have joined the chat room ' + roomName)
+
+	elif (command == 'leave'):
+		userName = socket.username
+		if userName is None:
+			socket.write_message('Error: Set a username first!')
+			return
+		roomName = message['body']
+		pC.leave_talkRoom(roomName)
+		socketsInRoomName[roomName].remove(socket)
+		socket.write_message('You have left the chat room ' + roomName)
+
+	else:
+		socket.write_message('Invalid command')
 
 # add connection
 def addConnection(socket):
-
 	# Temporary when we have only one room, later should be set in a join chatroom method
-	pikaConsumer.join_talkRoom('the_only_room')
-	socketsInRoomName['the_only_room'].append(socket)
+	socket.username = None
 
+	socketsInRoomName['the_first_room'].append(socket)
+	pC.join_talkRoom('the_first_room')
 
 	#print clients
 	#socket.routing_key = 'routing_key'
@@ -87,9 +112,3 @@ def removeConnection(socket):
 	for roomName in socketsInRoomName: 
 		room = socketsInRoomName[roomName]
 		del room[room.index(socket)]
-
-
-
-
-
-

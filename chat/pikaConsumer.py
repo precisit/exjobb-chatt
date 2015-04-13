@@ -1,3 +1,19 @@
+import pika
+from pika import adapters
+import uuid
+import router
+import logging
+import json
+
+from pika.adapters.tornado_connection import TornadoConnection
+
+class NullHandler(logging.Handler):
+    def emit(self, record):
+        pass
+
+logger = logging.getLogger('pika')
+logger.setLevel(logging.WARN)
+logger.addHandler(NullHandler())
 
 class PikaConsumer(object):
 
@@ -40,12 +56,16 @@ class PikaConsumer(object):
 		print 'Bind OK for routing key'
 		self.channel.basic_consume(self.on_message, self.QUEUE)
 
-	def on_message(self, channel_unused, basic_deliver, properties, body):
+	def on_message(self, channel_unused, basic_deliver, properties, message):
+		print "New message"
+
+		message = json.loads(message)
+
 		roomName = basic_deliver.routing_key.split('.')[1]
 		print 'Message received FROM RabbitMQ on room', roomName
 
-		for socket in socketsInRoomName[roomName]:
-			socket.write_message(body)
+		for socket in router.socketsInRoomName[roomName]:
+			socket.write_message(message['user'] + " says: " + message['body'])
 
 		self.channel.basic_ack(basic_deliver.delivery_tag)
 
@@ -56,6 +76,19 @@ class PikaConsumer(object):
 			self.roomNameSubscriptions[roomName] = self.channel.queue_bind(self.on_bindok, self.QUEUE, self.EXCHANGE, 'channel.' + roomName)
 		else: 
 			print '  - Already subscribed'
+
+		if roomName is not 'the_first_room':
+			for socket in router.socketsInRoomName[roomName]:
+				socket.write_message(socket.username + " joined the room " + roomName)
+
+	def leave_talkRoom(self, roomName):
+		if roomName not in self.roomNameSubscriptions:
+			socket.write_message("You are not subscribed to this room")
+		else: 
+			del self.roomNameSubscriptions[roomName]
+
+			for socket in router.socketsInRoomName[roomName]:
+				socket.write_message(socket.username + " left the room " + roomName)
 
 	def send_message(self, roomName, message):
 		print 'Will send message to room', roomName

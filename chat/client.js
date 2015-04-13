@@ -31,6 +31,10 @@ var ps = prompt({
 // Opens the websocket
 ws.on('open', function open() {
 	console.log('Socket open!');
+  console.log('Set a username by writing \"setUsername; username\"');
+  console.log('Send a message by writing \"sendMessage; message; room\"');
+  console.log('Join chat room by writing \"join; room');
+  console.log('Leave chat room by writing \"leave; room');
   ps.run();
 });
 
@@ -54,8 +58,24 @@ ws.on('message', function message(data, flags) {
 });
 
 ps.on('value', function(line) {
-    var message = line.join(' ');
-    ws.send(message, {mask: true});
+    var input = line.join(' ');
+    var partsOfMessage = input.split('; ');
+    var message = {};
+
+    message['command'] = partsOfMessage[0];
+    message['body'] = partsOfMessage[1];
+
+    console.log(partsOfMessage);
+
+    if (partsOfMessage.length < 3) {
+      message['room'] = 'default';
+    } else {
+      message['room'] = partsOfMessage[2];
+    }
+
+    jsonMessage = JSON.stringify(message);
+
+    ws.send(jsonMessage, {mask: true});
     console.log("Message sent");
 });
 
