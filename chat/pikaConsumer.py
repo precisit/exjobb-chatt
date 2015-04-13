@@ -93,3 +93,19 @@ class PikaConsumer(object):
 	def send_message(self, roomName, message):
 		print 'Will send message to room', roomName
 		self.channel.basic_publish(self.EXCHANGE, 'channel.'+roomName, message, properties=None, mandatory=False, immediate=False)
+
+	def on_cancelok(self, frame_unused):
+		self.channel.close() 
+		print 'Closing the channel'		
+
+	def stop_consuming(self):
+	    if self.channel:
+	    	self.channel.basic_cancel(self.on_cancelok, self.channel.basic_consume(self.on_message,
+                                                         self.QUEUE)
+
+
+
+
+
+
+

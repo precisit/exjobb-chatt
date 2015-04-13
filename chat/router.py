@@ -107,7 +107,10 @@ def addConnection(socket):
 # remove connection
 def removeConnection(socket):
 	# Remove user from dictionaries
-	del users[socket.username]
+	# del users[socket.username]
+	for userName in users:
+		usr= users[userName]
+	 	del usr[usr.index(socket)]
 
 	for roomName in socketsInRoomName: 
 		room = socketsInRoomName[roomName]
