@@ -34,7 +34,10 @@ def setUserName(socket, newUserName):
 
 # handle message
 def handleMessage(socket, message):
-	#print "Message: %s" % message
+	#print "Message: %s" % message'
+	# TODO: Client always send JSON as well, e.g. {command: 'setUsername', username: xxxx} OR {'command': 'sendMessage', roomName: 'the_only_room', message: 'Hello World!'}
+	# TODO2: Add command "joinChannel"
+	# TODO3: Add command "leaveChannel"
 	usrandmessage = message.partition(" ")
 
 	if (usrandmessage[0] == "usr"):
